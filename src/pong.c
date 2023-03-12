@@ -16,8 +16,8 @@ int main() {
       x_move *= -1;
     }
     //если коснулся ракетки
-    else if ((y_b == 10 && (x_b == x_r1 x_b == x_r1 - 1)) ||
-             (y_b == 70 && (x_b == x_r2 x_b == x_r2 - 1))) {
+    else if ((y_b == 10 && (x_b == x_r1 || x_b == x_r1 - 1)) ||
+             (y_b == 70 && (x_b == x_r2 || x_b == x_r2 - 1))) {
       y_move *= -1;
     }
     //если забили гол влево
@@ -80,10 +80,10 @@ void draw(int sc1, int sc2, int x_r1, int x_r2, int x_b, int y_b) {
     for (int j = 0; j < 80; j++) {
       if (i == 0 || i == 24) {
         printf("-");
-      } else if (j == 0(j == 40 && !(i == x_b && j == y_b))) {
+      } else if (j == 0 ||j == 40 && !(i == x_b && j == y_b))) {
         printf("|");
-      } else if (((i == x_r1 i == x_r1 - 1) && j == 9) ||
-                 ((i == x_r2 i == x_r2 - 1) && j == 71)) {
+      } else if (((i == x_r1 || i == x_r1 - 1) && j == 9) ||
+                 ((i == x_r2 || i == x_r2 - 1) && j == 71)) {
         printf("#");
       } else if (i == x_b && j == y_b) {
         printf("O");
