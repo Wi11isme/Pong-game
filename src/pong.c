@@ -1,132 +1,107 @@
-//I WANT TO PLAY WITH YOU
-//        YOUR FRIEND, AI
+#include <math.h>
 #include <stdio.h>
 
-int width = 80;
-int height = 25;
-int player1 = 0, player2 = 0;
-int ball_x = 13;
-int ball_y = 40;
-int ball_step_x = 1;
-int ball_step_y = 1;
-char input;
-int rocket_left = 13;
-int rocket_right = 13;
+void draw(int, int, int, int, int, int);
+void winner(int);
 
-int temp_move_ball = 0;
+int main() {
+  int sc1 = 0, sc2 = 0, x_r1 = 5, x_r2 = 20, x_b = 12, y_b = 40, x_move = -1,
+      y_move = -1, old_sc1 = sc1, old_sc2 = sc2;
+  char sy;
+  draw(sc1, sc2, x_r1, x_r2, x_b, y_b);
+  while (sc1 != 21 && sc2 != 21) {
 
-void field();
-void ball();
-void rocket(char);
-void score();
-
-int main(){
-    int winner = 0;
-    while (!winner){
-        field();
-        scanf("%c", &input);
-        rocket(input);
-        ball();
-        score();
-        winner = (player1 == 21 || player2 == 21) ? 1 : 0;
-        // q -  выход из игры
-        if (input == 'q' || input == 'Q'){
-            break;
-        }
+    // если коснулся борта
+    if (x_b == 1 || x_b == 23) {
+      x_move *= -1;
     }
-    return 0;
+    //если коснулся ракетки
+    else if ((y_b == 10 && (x_b == x_r1 x_b == x_r1 - 1)) ||
+             (y_b == 70 && (x_b == x_r2 x_b == x_r2 - 1))) {
+      y_move *= -1;
+    }
+    //если забили гол влево
+    else if (y_b == 9) {
+      old_sc2 = sc2;
+      sc2++;
+    }
+    //если забили гол вправо
+    else if (y_b == 71) {
+      old_sc1 = sc1;
+      sc1++;
+    }
+
+    //обработка клавиш упавления
+    int flag = 1;
+    while (flag) {
+      sy = getc(stdin);
+      while (getchar() != '\n') {
+      }
+      if (sy == 'a' || sy == 'A') {
+        flag = 0;
+        x_r1 = (x_r1 - 1 != 1) ? (x_r1 - 1) : x_r1;
+      } else if (sy == 'z' || sy == 'Z') {
+        flag = 0;
+        x_r1 = (x_r1 + 1 != 23) ? x_r1 + 1 : x_r1;
+      } else if (sy == 'k' || sy == 'K') {
+        flag = 0;
+        x_r2 = (x_r2 - 1 != 1) ? x_r2 - 1 : x_r2;
+      } else if (sy == 'm' || sy == 'M') {
+        flag = 0;
+        x_r2 = (x_r2 + 1 != 23) ? x_r2 + 1 : x_r2;
+      } else if (sy == ' ') {
+        flag = 0;
+      } else {
+        flag = 1;
+        printf("Введите другую клавишу!\n");
+      }
+    }
+    if (y_b != 9 && y_b != 71) {
+      y_b += y_move;
+      x_b += x_move;
+    }
+    //если кто-то забил гол
+    if (old_sc1 != sc1 || old_sc2 != sc2) {
+      old_sc1 = sc1;
+      old_sc2 = sc2;
+      x_b = 12;
+      y_b = 40;
+      x_move *= -1;
+      y_move *= -1;
+    }
+    draw(sc1, sc2, x_r1, x_r2, x_b, y_b);
+  }
+  winner(sc2);
+  return 0;
 }
 
-
-void field(){
-    char border = '|';
-    char top_bot_border = '-';
-    char space = ' ';
-    char left_rocket = '[';
-    char right_rocket = ']';
-    char ball = '*';
-    
-    // Начало цикла для печати строки
-    for (int i = 0; i <= 25; i++){
-        // Начало цикла для печати столбцов
-        for (int j = 0; j <= 80; j++){
-            if ((i == 0) || (i == 25)){
-                printf("%c", top_bot_border); //Условие для печати верхней и нижней границы
-            } else if ((i == ball_x) && (j == ball_y)){
-                printf("%c", ball); // Условие для печати мяча
-            } else if ((i == 3) && (j == 20)){
-                printf("%d", player1); // Условие для печати счета левого игрока
-            } else if ((i == 3) && (j ==  60)){
-                printf("%d", player2); // Условие для печати счета правого игрока
-            } else if ((j == 0) || (j == 40) || (j == 80)){
-                printf("%c", border); // Условие для печати границ слева-справа-посередине
-            } else if (j == 76) {
-                if ( i == rocket_right - 1 || i == rocket_right || i == rocket_right + 1) {
-                    // Условие для печати правой ракетки с учетом движения
-                    printf("%c", right_rocket);
-                } else {
-                    printf("%c", space); // Условие для печати пробелов в столбце ракеток
-                }
-            } else if (j == 4){
-                if (i == rocket_left - 1 || i == rocket_left || i == rocket_left + 1){
-                    // Условие для печати левой ракетки с учетом движения
-                    printf("%c", left_rocket);
-                }
-                else {
-                    printf("%c", space); // Печать пробелов в столбцах
-                }
-            } else {
-                    printf("%c", space); // Печать пробелов в строках
-                }
-            }
-        printf("\n");
+void draw(int sc1, int sc2, int x_r1, int x_r2, int x_b, int y_b) {
+  for (int i = 0; i < 25; i++) {
+    for (int j = 0; j < 80; j++) {
+      if (i == 0 || i == 24) {
+        printf("-");
+      } else if (j == 0(j == 40 && !(i == x_b && j == y_b))) {
+        printf("|");
+      } else if (((i == x_r1 i == x_r1 - 1) && j == 9) ||
+                 ((i == x_r2 i == x_r2 - 1) && j == 71)) {
+        printf("#");
+      } else if (i == x_b && j == y_b) {
+        printf("O");
+      } else {
+        printf(" ");
+      }
     }
-}
-// Функция движения мяча
-void ball(){
-    ball_x += ball_step_x;
-    ball_y += ball_step_y;
-    if (ball_x == 25 || ball_x == 1){
-        ball_step_x = -ball_step_x;
-    }
-    if (ball_y == 80 || ball_y == 1){
-        ball_step_y = -ball_step_y;
-    }
-    if ((ball_y == 5) && (ball_x == rocket_left || ball_x == rocket_left + 1 || ball_x == rocket_left -1)){
-        ball_step_x = -ball_step_x;
-        ball_step_y = -ball_step_y;
-    }
-    if ((ball_y == 75) && (ball_x == rocket_right || ball_x == rocket_right + 1 || ball_x == rocket_right -1)){
-        ball_step_x = -ball_step_x;
-        ball_step_y = -ball_step_y;
-    }
+    printf("\n");
+  }
+  printf("                                      %d   %d                        "
+         "              \n",
+         sc1, sc2);
 }
 
-// Функция для движения ракеток
-void rocket(char character){
-    if ((character == 'z' || character == 'Z')) rocket_left++;
-    if ((character == 'a' || character == 'A')) rocket_left--;
-    if ((character == 'k' || character == 'K')) rocket_right--;
-    if ((character == 'm' || character == 'M')) rocket_right++;
-    
-    if (rocket_right == 1 ){
-        rocket_right += 1;
-    } else if (rocket_right == 24) {
-        rocket_right -= 1;
-    } else if (rocket_left == 1) {
-        rocket_left += 1;
-    } else if (rocket_left == 24) {
-        rocket_left -= 1;
-    }
+void winner(int sc2) {
+  if (sc2 == 21) {
+    printf("Congratilations to Player 2! You won!");
+  } else {
+    printf("Congratulations to Player 1! You won!");
+  }
 }
-
-//Функция учета счета
-void score(){
-    if (ball_y == 1) {
-        player2 += 1;
-    }
-    else if (ball_y == 80){
-        player1 += 1;
-    }
-}
-
